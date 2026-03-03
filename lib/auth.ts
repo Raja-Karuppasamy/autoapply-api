@@ -60,29 +60,32 @@ export async function validateApiKey(
       };
     }
     
-    if (!result.is_active) {
+    // Check if key is active
+    if (result.is_active === false) {
       return {
         customer: result.customers as any,
-        apiKey: result,
+        apiKey: result as any,
         isValid: false,
         error: ApiErrorCode.API_KEY_INACTIVE,
       };
     }
     
+    // Check if key is expired
     if (result.expires_at && new Date(result.expires_at) < new Date()) {
       return {
         customer: result.customers as any,
-        apiKey: result,
+        apiKey: result as any,
         isValid: false,
         error: ApiErrorCode.API_KEY_EXPIRED,
       };
     }
     
+    // Check if customer subscription is active
     const customer = result.customers as any;
-    if (customer.subscription_status !== 'active' && customer.subscription_status !== 'trialing') {
+    if (customer && customer.subscription_status !== 'active' && customer.subscription_status !== 'trialing') {
       return {
         customer,
-        apiKey: result,
+        apiKey: result as any,
         isValid: false,
         error: ApiErrorCode.SUBSCRIPTION_INACTIVE,
       };
@@ -90,7 +93,7 @@ export async function validateApiKey(
     
     return {
       customer,
-      apiKey: result,
+      apiKey: result as any,
       isValid: true,
     };
     
