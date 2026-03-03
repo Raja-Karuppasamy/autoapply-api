@@ -2,17 +2,16 @@
 // Provides typed database access
 
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/database.types';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; // Service role for API
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
@@ -60,7 +59,7 @@ export async function createCustomer(customerData: any) {
 export async function updateCustomer(id: string, updates: any) {
   const { data, error } = await supabase
     .from('customers')
-    .update(updates)
+    .update(updates as never)
     .eq('id', id)
     .select()
     .single();
@@ -132,7 +131,7 @@ export async function updateApiKeyLastUsed(keyId: string, ipAddress?: string) {
     .update({
       last_used_at: new Date().toISOString(),
       last_request_ip: ipAddress,
-    } as any)
+    } as never)
     .eq('id', keyId);
   
   if (error) throw error;
@@ -146,7 +145,6 @@ export async function incrementApiKeyUsage(keyId: string) {
   });
   
   if (error) {
-    // Fallback if RPC doesn't exist
     const { data } = await supabase
       .from('api_keys')
       .select('total_requests')
@@ -156,7 +154,7 @@ export async function incrementApiKeyUsage(keyId: string) {
     if (data) {
       await supabase
         .from('api_keys')
-        .update({ total_requests: data.total_requests + 1 })
+        .update({ total_requests: data.total_requests + 1 } as never)
         .eq('id', keyId);
     }
   }
@@ -165,7 +163,7 @@ export async function incrementApiKeyUsage(keyId: string) {
 export async function deactivateApiKey(keyId: string) {
   const { error } = await supabase
     .from('api_keys')
-    .update({ is_active: false })
+    .update({ is_active: false } as never)
     .eq('id', keyId);
   
   if (error) throw error;
@@ -183,7 +181,7 @@ export async function getCustomerSubscription(customerId: string) {
     .eq('status', 'active')
     .single();
   
-  if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows
+  if (error && error.code !== 'PGRST116') throw error;
   return data;
 }
 
@@ -201,7 +199,7 @@ export async function createSubscription(subData: any) {
 export async function updateSubscription(stripeSubId: string, updates: any) {
   const { data, error } = await supabase
     .from('subscriptions')
-    .update(updates)
+    .update(updates as never)
     .eq('stripe_subscription_id', stripeSubId)
     .select()
     .single();
@@ -272,7 +270,6 @@ export async function checkRateLimit(
     windowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
   }
   
-  // Get or create rate limit record
   const { data: existingLimit } = await supabase
     .from('rate_limits')
     .select('*')
@@ -282,7 +279,6 @@ export async function checkRateLimit(
     .single();
   
   if (!existingLimit) {
-    // Create new window
     await supabase
       .from('rate_limits')
       .insert({
@@ -298,13 +294,12 @@ export async function checkRateLimit(
   const currentCount = existingLimit.request_count + 1;
   const allowed = currentCount <= limit;
   
-  // Increment counter
   await supabase
     .from('rate_limits')
     .update({
       request_count: currentCount,
       limit_exceeded_count: allowed ? existingLimit.limit_exceeded_count : existingLimit.limit_exceeded_count + 1,
-    })
+    } as never)
     .eq('id', existingLimit.id);
   
   return { allowed, currentCount };
