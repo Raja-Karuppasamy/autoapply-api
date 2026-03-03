@@ -41,12 +41,24 @@ export interface Customer {
 }
 
 export interface CustomerInsert {
+  id?: string;
   email: string;
   name?: string;
   company_name?: string;
+  stripe_customer_id?: string;
   subscription_tier?: SubscriptionTier;
+  subscription_status?: SubscriptionStatus;
   monthly_quota?: number;
+  current_usage?: number;
+  quota_reset_date?: string;
+  is_active?: boolean;
+  is_founding_customer?: boolean;
+  founding_customer_price?: number;
   notification_email?: string;
+  webhook_url?: string;
+  created_at?: string;
+  updated_at?: string;
+  last_active_at?: string;
 }
 
 export interface CustomerUpdate {
