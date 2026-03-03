@@ -46,7 +46,7 @@ export async function getCustomerById(id: string) {
   return data;
 }
 
-export async function createCustomer(customerData: Database['public']['Tables']['customers']['Insert']) {
+export async function createCustomer(customerData: any) {
   const { data, error } = await supabase
     .from('customers')
     .insert(customerData)
@@ -57,7 +57,7 @@ export async function createCustomer(customerData: Database['public']['Tables'][
   return data;
 }
 
-export async function updateCustomer(id: string, updates: Database['public']['Tables']['customers']['Update']) {
+export async function updateCustomer(id: string, updates: any) {
   const { data, error } = await supabase
     .from('customers')
     .update(updates)
@@ -115,7 +115,7 @@ export async function getCustomerApiKeys(customerId: string) {
   return data;
 }
 
-export async function createApiKey(keyData: Database['public']['Tables']['api_keys']['Insert']) {
+export async function createApiKey(keyData: any) {
   const { data, error } = await supabase
     .from('api_keys')
     .insert(keyData)
@@ -132,7 +132,7 @@ export async function updateApiKeyLastUsed(keyId: string, ipAddress?: string) {
     .update({
       last_used_at: new Date().toISOString(),
       last_request_ip: ipAddress,
-    })
+    } as any)
     .eq('id', keyId);
   
   if (error) throw error;
@@ -187,7 +187,7 @@ export async function getCustomerSubscription(customerId: string) {
   return data;
 }
 
-export async function createSubscription(subData: Database['public']['Tables']['subscriptions']['Insert']) {
+export async function createSubscription(subData: any) {
   const { data, error } = await supabase
     .from('subscriptions')
     .insert(subData)
@@ -198,7 +198,7 @@ export async function createSubscription(subData: Database['public']['Tables']['
   return data;
 }
 
-export async function updateSubscription(stripeSubId: string, updates: Partial<Database['public']['Tables']['subscriptions']['Row']>) {
+export async function updateSubscription(stripeSubId: string, updates: any) {
   const { data, error } = await supabase
     .from('subscriptions')
     .update(updates)
@@ -214,7 +214,7 @@ export async function updateSubscription(stripeSubId: string, updates: Partial<D
 // API USAGE HELPERS
 // ============================================================================
 
-export async function logApiUsage(usageData: Database['public']['Tables']['api_usage']['Insert']) {
+export async function logApiUsage(usageData: any) {
   const { error } = await supabase
     .from('api_usage')
     .insert(usageData);
@@ -314,7 +314,7 @@ export async function checkRateLimit(
 // USAGE ALERT HELPERS
 // ============================================================================
 
-export async function createUsageAlert(alertData: Database['public']['Tables']['usage_alerts']['Insert']) {
+export async function createUsageAlert(alertData: any) {
   const { error } = await supabase
     .from('usage_alerts')
     .insert(alertData);
@@ -343,7 +343,7 @@ export async function getCustomerAlerts(customerId: string, unacknowledgedOnly: 
 // AUDIT LOG HELPERS
 // ============================================================================
 
-export async function logAudit(auditData: Database['public']['Tables']['audit_logs']['Insert']) {
+export async function logAudit(auditData: any) {
   const { error } = await supabase
     .from('audit_logs')
     .insert(auditData);
